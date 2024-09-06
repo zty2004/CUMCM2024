@@ -10,8 +10,8 @@ r0 = 16 * 0.55
 dragon_head_length = (341 - 27.5 * 2) /100
 dragon_length = (220 - 27.5 * 2) / 100
 
-def fakecos(x):
-    return 1 - mp.power(x, 2) / 2 + mp.power(x, 4) / 24 - mp.power(x, 6) / 720
+#def fakecos(x):
+#    return 1 - mp.power(x, 2) / 2 + mp.power(x, 4) / 24 - mp.power(x, 6) / 720
 
 def polar2cartesian(theta):
     return [alpha * theta * mp.cos(theta), alpha * theta * mp.sin(theta)]
