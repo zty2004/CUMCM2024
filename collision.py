@@ -76,7 +76,7 @@ def overlap(rect):
     return -1
 
 
-df = pd.read_excel('output_loc.xlsx')
+df = pd.read_excel('output_loc_1.xlsx')
 data = df.to_numpy()
 points = []
 for j in range(points_length):

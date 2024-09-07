@@ -1,4 +1,4 @@
-data = readmatrix('output_loc.xlsx');
+data = readmatrix('output_loc_1.xlsx');
 %disp(data);
 x = zeros(224, 301);
 y = zeros(224, 301);
@@ -25,7 +25,7 @@ for i = 1:size(data, 2)
     s = scatter(x(:, i), y(:, i), 'r');
     disp(i - 1);
     drawnow;
-    pause(0.5);
+    pause;
     delete(p);
     delete(s);
 end

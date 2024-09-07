@@ -4,9 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 mp.dps = 50
-alpha = 0.55 / (2 * mp.pi)
+p = 0.55
+alpha = p / (2 * mp.pi)
 theta0 = 32 * mp.pi
-r0 = 16 * 0.55
+r0 = 16 * p
 dragon_head_length = (341 - 27.5 * 2) / 100
 dragon_length = (220 - 27.5 * 2) / 100
 
