@@ -7,6 +7,7 @@ for i in range(301):
 points = convert_dragon(points)
 
 data = {}
+points_length = len(points)
 for i in range(301):
     key = str(i) + 's'
     list = []
@@ -17,4 +18,4 @@ for i in range(301):
 
 print(data)
 df = pd.DataFrame(data)
-df.to_excel('output_loc.xlsx', index=False)
+df.to_excel('output_loc_1.xlsx', index=False)

@@ -56,7 +56,7 @@ def find_dragon(t):
 
 
 def find_dragon_velocity(t):
-    deltat = 1e-8
+    deltat = 1e-6
     dragon1 = find_dragon(t)
     dragon2 = find_dragon(t + deltat)
     v = []
