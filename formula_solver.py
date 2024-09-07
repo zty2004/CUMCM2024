@@ -18,10 +18,10 @@ def polar2cartesian(theta):
 
 def length(theta):
     tmp = mp.sqrt(1 + mp.power(theta, 2))
-    return 0.5 * mp.ln(theta + tmp) + 0.5 * theta * tmp
+    return alpha * (0.5 * mp.ln(theta + tmp) + 0.5 * theta * tmp)
 
 def find_dragon_head_1(t):
-    return mp.findroot(lambda x: length(theta0) - length(x) - t, t)
+    return mp.findroot(lambda x: length(theta0) - length(x) - t, 0)
 
 def find_dragon_next(theta, dist):
     delta_theta = mp.findroot(lambda x: ((2 * mp.power(theta, 2) + 2 * theta * x) * (1 - mp.cos(x)) + mp.power(x, 2)) - mp.power(dist/alpha, 2), 0.1)
@@ -40,6 +40,18 @@ def find_dragon(t):
         dragon = find_dragon_next(dragon, dragon_length)
     return ans
 
+def find_dragon_velocity(t):
+    deltat = 1e-8
+    dragon1 = find_dragon(t)
+    dragon2 = find_dragon(t + deltat)
+    v = []
+    for i in range(len(dragon1)):
+        vx = mp.fdiv(mp.fsub(dragon2[i][0], dragon1[i][0]), deltat);
+        vy = mp.fdiv(mp.fsub(dragon2[i][1], dragon1[i][1]), deltat);
+        vv = format(float(mp.nstr(mp.sqrt(vx**2 + vy**2), 8)), '.6f')
+        v.append(vv)
+    return v
+
 def convert_dragon(list):
     ans = []
     for i in list:
@@ -52,6 +64,7 @@ def convert_dragon(list):
         ans.append(list1)
     return ans
 
+#location
 points = []
 for i in range(301):
     points.append(find_dragon(i))
@@ -69,4 +82,21 @@ for i in range(301):
 
 print(data)
 df = pd.DataFrame(data)
-df.to_excel('output.xlsx', index=False)
+df.to_excel('output_loc.xlsx', index = False)
+
+#velocity
+velocity = []
+for i in range(301):
+    velocity.append(find_dragon_velocity(i))
+
+datav = {}
+for i in range(301):
+    key = str(i) + 's'
+    list = []
+    for j in velocity[i]:
+        list.append(j);
+    datav[key] = list
+    
+print(datav)
+dfv = pd.DataFrame(datav)
+dfv.to_excel('output_v.xlsx', index = False)

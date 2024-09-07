@@ -1,9 +1,9 @@
-data = readmatrix('output.xlsx');
+data = readmatrix('output_loc.xlsx');
 %disp(data);
 x = zeros(224, 301);
 y = zeros(224, 301);
 pi = acos(-1);
-theta = 0 : 0.1 : 34 * pi;
+theta = 0 : 0.1 : 50 * pi;
 alpha = 0.55 / (2 * pi);
 r = theta.*alpha;
 [rx, ry] = polar2cartesian(r, theta);
@@ -16,10 +16,10 @@ end
 plot(rx, ry, color = 'black');
 hold on;
 for i = 1 : size(data, 2)
-    p = plot(x(:, i), y(:, i), color = 'green');
-    s = scatter(x(:, i), y(:, i), color = 'red');
+    p = plot(x(:, i), y(:, i), 'g');
+    s = scatter(x(:, i), y(:, i), 'r');
     drawnow;
-    pause(0.2);
+    pause(0.5);
     delete(p);
     delete(s);
 end
