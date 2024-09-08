@@ -1,4 +1,4 @@
-from setup import *
+from result1 import *
 points = []
 t = 412.473843
 points.append(find_dragon(t))

@@ -1,5 +1,4 @@
-from setup import *
-from location import points_length
+from result1 import points_length
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
