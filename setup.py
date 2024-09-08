@@ -1,7 +1,5 @@
 from mpmath import mp
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 
 mp.dps = 50
 p = 0.55
@@ -69,11 +67,15 @@ def find_dragon_velocity(t):
     return v
 
 
+def dLdtheta(x):
+    return (2 * x**3 + mp.sqrt(1 + x**2) * (2 * x**2 + 1) + 2 * x) / (mp.sqrt(1 + x**2) * 2 * x + 2 * x**2 + 1)
+
+
 def find_dragon_fake_velocity(t):
     dragon = find_dragon_theta(t)
     v = []
     for i in dragon:
-        v.append(mp.fdiv(dragon[0], i))
+        v.append(mp.fdiv(dLdtheta(dragon[0]), dLdtheta(i)))
     return v
 
 

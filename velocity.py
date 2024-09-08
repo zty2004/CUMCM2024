@@ -1,21 +1,24 @@
 from setup import *
 
+sz = 2
+
 velocity = []
-for i in range(301):
+for i in range(sz):
     velocity.append(find_dragon_velocity(i))
 
 fake_velocity = []
-for i in range(301):
+for i in range(sz):
     fake_velocity.append(find_dragon_fake_velocity(i))
+print(fake_velocity)
 
-'''
-for i in range(301):
-    dv = [a - b for a, b in zip(velocity[i], fake_velocity[i])]
-print(dv)
-'''
+dv = []
+for i in range(sz):
+    dv.append([a - b for a, b in zip(velocity[i], fake_velocity[i])])
+# print(dv)
+
 
 datav = {}
-for i in range(301):
+for i in range(sz):
     key = str(i) + 's'
     list = []
     for j in velocity[i]:
@@ -23,5 +26,5 @@ for i in range(301):
     datav[key] = list
 
 # print(datav)
-dfv = pd.DataFrame(datav)
-dfv.to_excel('output_v_1.xlsx', index=False)
+# dfv = pd.DataFrame(datav)
+# dfv.to_excel('output_v_1.xlsx', index=False)
