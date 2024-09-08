@@ -1,6 +1,5 @@
-from setup import *
 
-sz = 2
+sz = 301
 
 velocity = []
 for i in range(sz):
@@ -25,6 +24,6 @@ for i in range(sz):
         list.append(format(float(mp.nstr(j, 8)), '.6f'))
     datav[key] = list
 
-# print(datav)
-# dfv = pd.DataFrame(datav)
-# dfv.to_excel('output_v_1.xlsx', index=False)
+print(datav)
+dfv = pd.DataFrame(datav)
+dfv.to_excel('output_v_1.xlsx', index=False)
