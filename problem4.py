@@ -11,33 +11,70 @@ dragon_head_length = (341 - 27.5 * 2) / 100
 dragon_length = (220 - 27.5 * 2) / 100
 
 
-def collision(t):
-    def polar2cartesian(theta):
-        return [alpha * theta * mp.cos(theta), alpha * theta * mp.sin(theta)]
+def polar2cartesian(theta):
+    return np.array([alpha * theta * np.cos(theta), alpha * theta * np.sin(theta)])
 
-    def convert_dragon(list):
-        ans = []
-        for i in list:
-            list1 = []
-            for j in i:
-                list1.append(float(format(float(mp.nstr(j, 8)), '.6f')))
-            ans.append(list1)
-        return ans
+
+def rotate(v, theta):
+    cc = np.cos(theta)
+    ss = np.sin(theta)
+    return [v[0] * cc + v[1] * (-ss), v[0] * ss + v[1] * cc]
+
+
+def collision(t, r, polarx, polary, xx, yy, cx, cy, theta1, theta2, tra):
+    def length(theta):
+        tmp = mp.sqrt(1 + mp.power(theta, 2))
+        return alpha * (0.5 * mp.ln(theta + tmp) + 0.5 * theta * tmp)
+
+    def dis(v1, v2):
+        return np.sqrt(np.dot(v2 - v1, v2 - v1))
 
     def find_dragon_head_1(t):
+        R1 = k * r
+        R2 = r
+        a = R1 * theta1
+        b = R2 * theta2
+        if t <= 0:
+            pol = mp.findroot(lambda x: length(
+                x) - length(polarx) + t, 1 / polarx)
+            pol = float(format(float(mp.nstr(pol, 8)), '.6f'))
+            return polar2cartesian(pol)
+        elif t < a:
+            return cx + rotate(xx - cx, -t / R1)
+        elif t < a + b:
+            return cy + rotate(yy - cy, (t - a - b) / R2)
+        else:
+            pol = mp.findroot(lambda x: length(
+                x) - length(polary) - t + a + b, 1 / polary)
+            pol = float(format(float(mp.nstr(pol, 8)), '.6f'))
+            return -1 * polar2cartesian(pol)
+# To Do:
 
-    def find_dragon_next(theta, dist):
-        delta_theta = mp.findroot(lambda x: ((2 * mp.power(theta, 2) + 2 * theta * x) * (
-            1 - mp.cos(x)) + mp.power(x, 2)) - mp.power(dist/alpha, 2), 1 / theta)
-        return theta + delta_theta
+    def find_dragon_next(dragon, dist, tra):
+        mn = 1
+        r = 0
+        for i in range(np.shape(tra)[0]):
+            delta = dis(tra[i], dragon)
+            if dis(tra[i], dragon) < mn:
+                mn = delta
+                r = i
+        l = r - 500
+        eps = 1e-6
+        while l < r:
+            m = int((l + r) / 2)
+            if dis(tra[m], dragon) - dist > eps:
+                l = m + 1
+            else:
+                r = m
+        return tra[l]
 
-    def find_dragon(t):
+    def find_dragon(t, tra):
         dragon = find_dragon_head_1(t)
-        ans = [polar2cartesian(dragon)]
-        dragon = find_dragon_next(dragon, dragon_head_length)
+        ans = [dragon]
+        dragon = find_dragon_next(dragon, dragon_head_length, tra)
         for i in range(1, 224):
-            ans.append(polar2cartesian(dragon))
-            dragon = find_dragon_next(dragon, dragon_length)
+            ans.append(dragon)
+            dragon = find_dragon_next(dragon, dragon_length, tra)
         return ans
 
     def get_rect(a, b):
@@ -94,7 +131,8 @@ def collision(t):
     def point_cast(a, b, p):
         u = p - a
         v = b - a
-        p_cast = a + v * (np.dot(v, u) / np.dot(v, v))
+        p_cast = a + v * (np.dot(v, u) / np.dot(v, v)
+                          ) if np.dot(v, v) != 0 else v
         return p_cast
 
     def overlap(rect):
@@ -103,7 +141,7 @@ def collision(t):
                 return i
         return -1
 
-    dragon = convert_dragon(find_dragon(t))
+    dragon = find_dragon(t, tra)
     rect = []
     for i in range(0, len(dragon) - 1):
         rect.append(get_rect(dragon[i], dragon[i + 1]))
@@ -155,10 +193,28 @@ def get_angle(v1, v2):
     return angle_radians
 
 
+def find_trajectory(x, y, xx, yy, cx, cy, theta1, theta2):
+    t1 = np.linspace(x, 32 * pi, 1000)
+    t2 = np.linspace(0, theta1, 1000)
+    t3 = np.linspace(0, theta2, 1000)
+    t4 = np.linspace(y, 32 * pi, 1000)
+    p = []
+    t1 = np.flip(t1)
+    for i in t1:
+        p.append(polar2cartesian(i))
+    for i in t2:
+        p.append(cx + rotate(xx - cx, -i))
+    for i in t3:
+        p.append(cy + rotate(yy - cy, -i))
+    for i in t4:
+        p.append(-1 * polar2cartesian(i))
+    return p
+
+
 def s(x, y):
     v1 = np.array([np.cos(x), np.sin(x)])
     v2 = -np.array([np.cos(y), np.sin(y)])
-    if get_angle(v1, v2) < pi / 2 or x[i] < y[j]:
+    if get_angle(v1, v2) < pi / 2 or x < y:
         return -1
     r = get_radius(x, y)
     xx, yy, cx, cy = get_center(x, y, r)
@@ -173,10 +229,17 @@ def s(x, y):
         theta1 = 2 * pi - theta1
     if np.cross(c, d) < 0:
         theta2 = 2 * pi - theta2
+    arcs = theta1 * r * k + theta2 * r
+    tra = find_trajectory(x, y, xx, yy, cx, cy, theta1, theta2)
+    for i in range(201):
+        if collision(i - 100, r, x, y, xx, yy, cx, cy, theta1, theta2, tra):
+            print(i - 100)
+            return -1
+    return arcs
 
-    return theta1 * r * k + theta2 * r
 
-
+print(s(16, 15))
+'''
 theta0 = 2 * r0 * pi / p
 sz = 200
 mn = 100
@@ -198,10 +261,10 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.plot_surface(X, Y, Z, cmap='viridis')
 
-# 设置标题和标签
-ax.set_title("3D Surface Plot")
-ax.set_xlabel('X axis')
-ax.set_ylabel('Y axis')
-ax.set_zlabel('Z axis')
+ax.set_title("Plot")
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
 
 plt.show()
+'''
